@@ -1,0 +1,1421 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8" />
+  <meta name="robots" content="noindex, nofollow, noarchive, nosnippet" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Generatore eventi</title>
+
+  <style>
+    /* ─── Base ─────────────────────────────────────────────────────── */
+    :root { font-family: -apple-system, system-ui, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+    [hidden] { display:none !important; }
+    body  { margin:0; background:#f6f6f7; color:#111; }
+    .wrap { max-width:980px; margin:0 auto; padding:18px; }
+    .topbar { display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:12px; }
+
+    /* ─── Cards ─────────────────────────────────────────────────────── */
+    .card { background:#fff; border:1px solid #e6e6e8; border-radius:14px; padding:16px; box-shadow:0 1px 0 rgba(0,0,0,.03); }
+    .card + .card { margin-top:14px; }
+
+    /* ─── Typography ─────────────────────────────────────────────────── */
+    h1 { font-size:20px; margin:0; }
+    h2 { font-size:15px; font-weight:600; margin:0 0 10px; color:#444; text-transform:uppercase; letter-spacing:.04em; }
+    h3 { font-size:13px; font-weight:600; margin:0 0 8px; color:#444; }
+    .muted { color:#666; font-size:13px; }
+    .mt   { margin-top:12px; }
+    .mt-s { margin-top:8px; }
+
+    /* ─── Sections ───────────────────────────────────────────────────── */
+    .section { margin-bottom:20px; }
+    .section:last-child { margin-bottom:0; }
+    .section-head { display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; gap:10px; flex-wrap:wrap; }
+    .section-head h2 { margin:0; }
+    .section-divider { border:none; border-top:1px solid #ececf0; margin:20px 0; }
+
+    /* ─── Grid ───────────────────────────────────────────────────────── */
+    .grid  { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+    .grid3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; }
+    .grid4 { display:grid; grid-template-columns:1.2fr 1.2fr 1.2fr 1fr; gap:10px; }
+
+    /* ─── Form ───────────────────────────────────────────────────────── */
+    label { display:block; font-size:12px; color:#444; margin-bottom:6px; }
+    input, select, textarea {
+      width:100%; box-sizing:border-box; padding:10px; border-radius:10px; border:1px solid #d9d9dd;
+      background:#fff; font-size:14px; min-width:0; font-family:inherit; color:inherit;
+    }
+    input:disabled, select:disabled { background:#f3f3f5; color:#999; }
+    input[type="date"], input[type="time"] { -webkit-appearance:none; appearance:none; max-width:100%; min-height:40px; }
+    textarea { min-height:90px; resize:vertical; line-height:1.45; }
+
+    /* ─── Buttons ────────────────────────────────────────────────────── */
+    .row { display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+    button, .btn-link {
+      padding:10px 14px; border-radius:12px; border:1px solid #111; background:#111; color:#fff;
+      font-size:14px; cursor:pointer; font-family:inherit; text-decoration:none;
+      display:inline-flex; align-items:center; gap:6px; box-sizing:border-box;
+    }
+    button.secondary, .btn-link { background:#fff; color:#111; border-color:#d9d9dd; }
+    button.small, .btn-link.small { font-size:12px; padding:6px 12px; }
+    button.ghost { color:#888; border-color:#ddd; }
+    button.danger { color:#b42318; }
+    button:disabled { opacity:.6; cursor:default; }
+    .chip-btn { background:#fff; color:#111; border:1px solid #d9d9dd; border-radius:999px; padding:5px 12px; font-size:12.5px; }
+    .chip-btn.active { border-color:#111; background:#f0f0f3; }
+
+    /* ─── Pills / toggles ────────────────────────────────────────────── */
+    .pill, .toggle-pill {
+      display:inline-flex; align-items:center; gap:8px; margin:0; padding:10px 14px;
+      border:1px solid #d9d9dd; border-radius:10px; background:#fff; cursor:pointer; font-size:13px; color:#111;
+    }
+    .pill input, .toggle-pill input { width:auto; margin:0; }
+    .pill:has(input:checked), .toggle-pill:has(input:checked) { border-color:#111; background:#f9f9fb; }
+    .pill .dot { width:9px; height:9px; border-radius:50%; display:inline-block; }
+    .subbox { margin-top:10px; padding:12px; border:1px solid #ececf0; border-radius:12px; background:#fbfbfc; }
+
+    /* ─── Rubrica ────────────────────────────────────────────────────── */
+    .book-tools { display:grid; grid-template-columns:1fr 200px; gap:8px; }
+    .contacts { max-height:280px; overflow:auto; border:1px solid #ececf0; border-radius:12px; margin-top:8px; background:#fff; }
+    .contact-row { display:flex; align-items:center; gap:10px; padding:9px 12px; border-top:1px solid #f0f0f3; cursor:pointer; margin:0; color:#111; }
+    .contact-row:first-child { border-top:none; }
+    .contact-row input { width:auto; margin:0; flex-shrink:0; }
+    .contact-row:has(input:checked) { background:#f6f7fb; }
+    .contact-main { min-width:0; flex:1; }
+    .contact-name { font-size:14px; font-weight:500; }
+    .contact-mail { font-size:12px; color:#666; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .group-tag { font-size:11px; color:#555; background:#f0f0f3; padding:2px 8px; border-radius:999px; flex-shrink:0; }
+    .empty { padding:14px; color:#666; font-size:13px; }
+
+    /* ─── Menu a tendina della rubrica ──────────────────────────────── */
+    .picker { position:relative; }
+    .picker-btn {
+      width:100%; justify-content:space-between; background:#fff; color:#111;
+      border:1px solid #d9d9dd; border-radius:10px; padding:10px;
+    }
+    .picker-btn[aria-expanded="true"] { border-color:#111; }
+    .caret { color:#666; font-size:15px; line-height:1; }
+    .picker-panel {
+      position:absolute; left:0; right:0; top:calc(100% + 6px); z-index:5;
+      background:#fff; border:1px solid #d9d9dd; border-radius:12px; padding:10px;
+      box-shadow:0 8px 24px rgba(0,0,0,.12);
+    }
+    .picker-panel .contacts { max-height:260px; }
+    .picker-foot { justify-content:space-between; }
+
+    /* ─── Partecipanti scelti ────────────────────────────────────────── */
+    .email-row { display:flex; gap:8px; }
+    .email-row input { flex:1; }
+    .chips { display:flex; flex-wrap:wrap; gap:6px; }
+    .chip {
+      display:inline-flex; align-items:center; gap:6px; max-width:100%; box-sizing:border-box;
+      padding:3px 3px 3px 10px; border:1px solid #d9d9dd; border-radius:999px; background:#fff; font-size:13px;
+    }
+    .chip.opt { border-style:dashed; color:#555; }
+    .chip-name { font-weight:500; white-space:nowrap; }
+    .chip-mail { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; min-width:0; color:#555; }
+    .chip select.chip-sel {
+      width:auto; max-width:240px; padding:2px 6px; font-size:12px; border-radius:999px;
+      border:1px solid #e0e0e4; background:#f6f6f8; min-width:0;
+    }
+    .chip-opt { background:#f0f0f3; color:#444; border:none; border-radius:999px; padding:3px 8px; font-size:11px; flex-shrink:0; }
+    .chip.opt .chip-opt { background:#fff4e5; color:#a15a00; }
+    .chip-x { background:transparent; color:#888; border:none; border-radius:999px; padding:2px 8px; font-size:16px; line-height:1; flex-shrink:0; }
+    .chip-x:hover { background:#f0f0f3; color:#111; }
+
+    /* ─── Editor rubrica ─────────────────────────────────────────────── */
+    .book-list .bk { display:flex; justify-content:space-between; align-items:center; gap:10px; padding:8px 0; border-top:1px solid #ececf0; }
+    .book-list .bk:first-child { border-top:none; }
+    .bk-info { min-width:0; }
+    .bk-actions { display:flex; gap:6px; flex-shrink:0; }
+
+    /* ─── Status ─────────────────────────────────────────────────────── */
+    .tag  { font-size:12px; color:#444; background:#f0f0f3; padding:4px 8px; border-radius:999px; }
+    .ok   { color:#0a7a2f; }
+    .warn { color:#a15a00; }
+    .err  { color:#b42318; }
+    .confirm {
+      margin-top:12px; padding:12px; border:1px solid #111; border-radius:12px; background:#f9f9fb;
+      display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap; font-size:14px;
+    }
+
+    /* ─── Anteprima / output ─────────────────────────────────────────── */
+    .msgHeader { display:flex; justify-content:space-between; align-items:center; gap:10px; margin-bottom:10px; }
+    .pv-title { font-size:17px; font-weight:600; margin-bottom:8px; overflow-wrap:anywhere; }
+    .pv-row { display:grid; grid-template-columns:26px 1fr; gap:4px; font-size:14px; padding:3px 0; overflow-wrap:anywhere; }
+    .out { white-space:pre-wrap; overflow-wrap:anywhere; background:#fbfbfc; border:1px solid #ececf0; border-radius:12px; padding:12px; font-size:13.5px; line-height:1.55; margin-top:10px; }
+    .result-card { border-color:#0a7a2f; box-shadow:0 0 0 3px rgba(10,122,47,.08); }
+    .note { font-size:12.5px; color:#666; margin-top:10px; }
+
+    /* ─── Prossimi eventi ────────────────────────────────────────────── */
+    .ev { display:flex; justify-content:space-between; align-items:center; gap:10px; padding:10px 0; border-top:1px solid #ececf0; }
+    .ev:first-child { border-top:none; padding-top:0; }
+    .ev-title { font-weight:600; font-size:14px; overflow-wrap:anywhere; }
+    .ev-actions { display:flex; gap:6px; flex-wrap:wrap; align-items:center; justify-content:flex-end; flex-shrink:0; }
+
+    /* ─── Toast ──────────────────────────────────────────────────────── */
+    .toast {
+      position:fixed; left:50%; bottom:18px; z-index:10; max-width:90vw; transform:translate(-50%, 20px); opacity:0;
+      pointer-events:none; background:#111; color:#fff; padding:10px 16px; border-radius:12px; font-size:14px;
+      transition:opacity .2s, transform .2s;
+    }
+    .toast.show { opacity:1; transform:translate(-50%, 0); }
+    .toast.ok   { background:#0a7a2f; }
+    .toast.warn { background:#a15a00; }
+    .toast.err  { background:#b42318; }
+
+    /* ─── Accesso ────────────────────────────────────────────────────── */
+    .login {
+      position:fixed; inset:0; z-index:9999; background:#111;
+      display:flex; align-items:center; justify-content:center; padding:16px;
+    }
+    .login-box {
+      width:380px; max-width:100%; box-sizing:border-box; background:#fff; border-radius:14px; padding:22px;
+      display:flex; flex-direction:column; gap:12px; box-shadow:0 4px 12px rgba(0,0,0,.15);
+    }
+    .login-box h2 { text-transform:none; letter-spacing:0; font-size:17px; color:#111; margin:0; }
+    .login-box input { font-size:16px; }
+    .login-box button { justify-content:center; }
+    .login-err { color:#b42318; font-size:13px; min-height:18px; }
+
+    /* ─── Responsive ─────────────────────────────────────────────────── */
+    @media (max-width:760px) {
+      .grid, .grid3, .grid4, .book-tools { grid-template-columns:1fr; }
+      input, select, textarea { font-size:16px; }
+    }
+    @media (max-width:520px) {
+      .wrap { padding:10px; }
+      .card { padding:12px; border-radius:12px; }
+      h1 { font-size:17px; }
+      .toggle-pill { width:100%; box-sizing:border-box; }
+      .ev, .book-list .bk { flex-direction:column; align-items:flex-start; }
+      .ev-actions { justify-content:flex-start; }
+      .chip { flex-wrap:wrap; border-radius:14px; }
+    }
+  </style>
+</head>
+
+<body>
+
+<!-- ── Accesso ─────────────────────────────────────────────────────── -->
+<div class="login" id="login">
+  <form class="login-box" id="loginForm" autocomplete="on">
+    <h2>Generatore eventi · Accesso</h2>
+    <input type="text" name="username" value="generatore-eventi" autocomplete="username" hidden />
+    <input id="loginPw" type="password" placeholder="Password" autocomplete="current-password" required />
+    <button type="submit" id="loginBtn">Accedi</button>
+    <div class="login-err" id="loginErr"></div>
+    <div class="muted">Solo uso personale. L'accesso resta valido su questo dispositivo per 30 giorni.</div>
+  </form>
+</div>
+
+<div class="wrap">
+
+  <div class="topbar">
+    <h1>Generatore eventi</h1>
+    <div class="row">
+      <span class="tag" id="userTag">…</span>
+      <button type="button" id="logout" class="secondary small ghost">Esci</button>
+    </div>
+  </div>
+
+  <!-- ── Form ─────────────────────────────────────────────────────── -->
+  <div class="card">
+
+    <!-- 1 · Evento -->
+    <div class="section">
+      <div class="section-head">
+        <h2>1 · Evento</h2>
+        <button type="button" id="resetTop" class="secondary small ghost">&#8635; Reset</button>
+      </div>
+
+      <label for="title">Titolo *</label>
+      <input id="title" placeholder="Riunione progetto" autocomplete="off" />
+
+      <div class="grid3 mt">
+        <div><label for="date">Data *</label><input id="date" type="date" /></div>
+        <div><label for="start">Inizio *</label><input id="start" type="time" step="300" /></div>
+        <div><label for="end">Fine *</label><input id="end" type="time" step="300" /></div>
+      </div>
+
+      <div class="row mt-s" id="durations">
+        <span class="muted">Durata:</span>
+        <button type="button" class="chip-btn" data-dur="30">30 min</button>
+        <button type="button" class="chip-btn" data-dur="60">1 h</button>
+        <button type="button" class="chip-btn" data-dur="90">1 h 30</button>
+        <button type="button" class="chip-btn" data-dur="120">2 h</button>
+        <button type="button" class="chip-btn" data-dur="180">3 h</button>
+      </div>
+
+      <div class="grid3 mt">
+        <div>
+          <label for="calendar">Calendario</label>
+          <select id="calendar"><option value="primary">Calendario principale</option></select>
+        </div>
+        <div>
+          <label for="repeat">Ripetizione</label>
+          <select id="repeat">
+            <option value="none" selected>Non si ripete</option>
+            <option value="weekly">Ogni settimana</option>
+            <option value="biweekly">Ogni 2 settimane</option>
+            <option value="monthly">Ogni mese</option>
+          </select>
+        </div>
+        <div>
+          <label for="count">Numero di incontri</label>
+          <input id="count" type="number" min="2" max="52" value="8" />
+        </div>
+      </div>
+    </div>
+
+    <hr class="section-divider">
+
+    <!-- 2 · Partecipanti -->
+    <div class="section">
+      <div class="section-head">
+        <h2>2 · Partecipanti</h2>
+        <button type="button" id="toggleBook" class="secondary small">✏️ Gestisci rubrica</button>
+      </div>
+
+      <div class="picker" id="picker">
+        <button type="button" id="pickerBtn" class="picker-btn" aria-expanded="false" aria-controls="pickerPanel">
+          <span>Scegli dalla rubrica</span><span class="caret" aria-hidden="true">▾</span>
+        </button>
+        <div class="picker-panel" id="pickerPanel" hidden>
+          <div class="book-tools">
+            <input id="search" type="search" placeholder="Cerca…" autocomplete="off" />
+            <select id="groupFilter"><option value="">Tutti i gruppi</option></select>
+          </div>
+          <div class="contacts" id="contacts"></div>
+          <div class="row mt-s picker-foot">
+            <button type="button" id="selectVisible" class="secondary small">Seleziona tutti i visibili</button>
+            <button type="button" id="pickerDone" class="small">Fatto</button>
+          </div>
+        </div>
+      </div>
+      <div class="row mt-s">
+        <span class="muted" id="attCount"></span>
+        <button type="button" id="clearAtt" class="secondary small ghost">Deseleziona tutti</button>
+      </div>
+
+      <!-- Partecipanti scelti -->
+      <div id="chips" class="chips mt"></div>
+
+      <label for="emailInput" class="mt">Altri indirizzi</label>
+      <div class="email-row">
+        <input id="emailInput" type="text" inputmode="email" autocomplete="off" placeholder="nome@esempio.it" />
+        <button type="button" id="addEmail" class="secondary">Aggiungi</button>
+      </div>
+
+      <!-- Editor rubrica -->
+      <div id="bookEditor" class="subbox" hidden>
+        <h3 id="bkFormTitle">Nuovo contatto</h3>
+        <div class="grid4">
+          <div><label for="bkName">Nome</label><input id="bkName" placeholder="Mario Rossi" autocomplete="off" /></div>
+          <div><label for="bkGmail">Gmail (preferita)</label><input id="bkGmail" type="email" placeholder="mario@gmail.com" autocomplete="off" /></div>
+          <div><label for="bkAlt">Email alternativa</label><input id="bkAlt" type="email" placeholder="mario@univr.it" autocomplete="off" /></div>
+          <div><label for="bkGroup">Gruppo</label><input id="bkGroup" list="groupList" placeholder="Dottorandi" autocomplete="off" /><datalist id="groupList"></datalist></div>
+        </div>
+        <div class="row mt-s">
+          <button type="button" id="bkSave">Salva contatto</button>
+          <button type="button" id="bkCancel" class="secondary" hidden>Annulla modifica</button>
+        </div>
+
+        <details class="mt">
+          <summary class="muted" style="cursor:pointer;">Importa più contatti insieme</summary>
+          <div class="muted mt-s">Una riga per persona: <code>Nome; gmail; altra email; gruppo</code></div>
+          <textarea id="bkImport" class="mt-s" placeholder="Mario Rossi; mario@gmail.com; mario@univr.it; Dottorandi"></textarea>
+          <button type="button" id="bkImportBtn" class="secondary mt-s">Importa</button>
+        </details>
+
+        <h3 class="mt">Contatti in rubrica</h3>
+        <div class="book-list" id="bookList"></div>
+      </div>
+
+      <div class="row mt">
+        <label class="toggle-pill"><input type="checkbox" id="canSee" checked /> Vedono gli altri invitati</label>
+        <label class="toggle-pill"><input type="checkbox" id="canInvite" /> Possono invitare altri</label>
+        <label class="toggle-pill"><input type="checkbox" id="canModify" /> Possono modificare l'evento</label>
+      </div>
+    </div>
+
+    <hr class="section-divider">
+
+    <!-- 3 · Luogo & riunione online -->
+    <div class="section">
+      <h2>3 · Luogo &amp; riunione online</h2>
+
+      <label for="place">Luogo (opzionale)</label>
+      <input id="place" placeholder="Aula 3" />
+
+      <label class="mt">Riunione online</label>
+      <div class="row">
+        <label class="pill"><input type="radio" name="online" value="none" checked /> Nessuna</label>
+        <label class="pill"><input type="radio" name="online" value="meet" /> <span class="dot" style="background:#00897b"></span> Google Meet</label>
+        <label class="pill"><input type="radio" name="online" value="zoom" /> <span class="dot" style="background:#2d8cff"></span> Zoom</label>
+        <label class="pill"><input type="radio" name="online" value="teams" /> <span class="dot" style="background:#5b5fc7"></span> Teams</label>
+      </div>
+
+      <div id="meetBox" class="muted mt-s" hidden>
+        Il link Meet viene creato e aggiunto all'invito.
+      </div>
+
+      <div id="zoomBox" class="subbox" hidden>
+        <label for="zoomLink">Link Zoom (predefinito: stanza personale)</label>
+        <input id="zoomLink" type="text" autocomplete="off" />
+        <div class="grid mt-s">
+          <div><label for="zoomId">ID riunione (opzionale)</label><input id="zoomId" autocomplete="off" /></div>
+          <div><label for="zoomPw">Passcode (opzionale)</label><input id="zoomPw" autocomplete="off" /></div>
+        </div>
+        <button type="button" id="zoomRestore" class="secondary small mt-s">↺ Usa la stanza personale</button>
+      </div>
+
+      <div id="teamsBox" class="subbox" hidden>
+        <label for="teamsLink">Link riunione Teams</label>
+        <input id="teamsLink" type="text" placeholder="https://teams.microsoft.com/…" autocomplete="off" />
+        <div class="muted mt-s" id="teamsHint">Incolla il link "Partecipa alla riunione". Link fisso: <code>TEAMS_LINK</code> in Code.gs.</div>
+      </div>
+    </div>
+
+    <hr class="section-divider">
+
+    <!-- 4 · Dettagli -->
+    <div class="section">
+      <h2>4 · Dettagli</h2>
+
+      <label for="description">Descrizione (opzionale)</label>
+      <textarea id="description" placeholder="Ordine del giorno"></textarea>
+
+      <div class="grid3 mt">
+        <div>
+          <label for="lang">Lingua del testo</label>
+          <select id="lang">
+            <option value="it" selected>Italiano</option>
+            <option value="en">English</option>
+            <option value="both">Italiano + English</option>
+          </select>
+        </div>
+        <div>
+          <label for="reminder">Promemoria (solo per te)</label>
+          <select id="reminder">
+            <option value="default" selected>Predefinito del calendario</option>
+            <option value="10">10 minuti prima</option>
+            <option value="30">30 minuti prima</option>
+            <option value="60">1 ora prima</option>
+            <option value="1440">1 giorno prima</option>
+            <option value="none">Nessuno</option>
+          </select>
+        </div>
+        <div>
+          <label for="color">Colore</label>
+          <select id="color">
+            <option value="" selected>Predefinito</option>
+            <option value="9">Mirtillo</option>
+            <option value="1">Lavanda</option>
+            <option value="7">Pavone</option>
+            <option value="2">Salvia</option>
+            <option value="10">Basilico</option>
+            <option value="5">Banana</option>
+            <option value="6">Mandarino</option>
+            <option value="4">Fenicottero</option>
+            <option value="11">Pomodoro</option>
+            <option value="3">Vinaccia</option>
+            <option value="8">Grafite</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <hr class="section-divider">
+
+    <!-- 5 · Invio -->
+    <div class="section">
+      <h2>5 · Invio</h2>
+      <label class="toggle-pill">
+        <input type="checkbox" id="sendInvites" checked />
+        <span><strong>Invia email di invito</strong></span>
+      </label>
+
+      <div class="row mt">
+        <button type="button" id="create">Crea evento</button>
+        <button type="button" id="resetBottom" class="secondary ghost">&#8635; Reset</button>
+        <span class="muted" id="summary"></span>
+      </div>
+
+      <div id="confirmBox" class="confirm" hidden>
+        <span id="confirmText"></span>
+        <div class="row">
+          <button type="button" id="confirmYes">Conferma</button>
+          <button type="button" id="confirmNo" class="secondary">Annulla</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Risultato ─────────────────────────────────────────────────── -->
+  <div class="card result-card" id="resultCard" hidden>
+    <div class="msgHeader">
+      <strong id="resultTitle"></strong>
+      <button type="button" id="resultClose" class="secondary small ghost">Chiudi</button>
+    </div>
+    <div class="row" id="resultLinks"></div>
+    <div class="out" id="resultText"></div>
+    <div class="note">
+      "Aggiungi al calendario" serve a chi non è tra gli invitati.
+    </div>
+  </div>
+
+  <!-- ── Anteprima ─────────────────────────────────────────────────── -->
+  <div class="card">
+    <div class="msgHeader">
+      <h2 style="margin:0;">Anteprima invito</h2>
+      <button type="button" id="copyPreview" class="secondary small">Copia testo</button>
+    </div>
+    <div id="preview"></div>
+  </div>
+
+  <!-- ── Prossimi eventi ───────────────────────────────────────────── -->
+  <div class="card">
+    <div class="msgHeader">
+      <h2 style="margin:0;">Prossimi eventi creati da qui</h2>
+      <button type="button" id="refresh" class="secondary small">&#8635; Aggiorna</button>
+    </div>
+    <div id="upcoming"></div>
+  </div>
+
+</div><!-- /wrap -->
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+
+<script>
+/* ═══════════════════════════════════════════════════════════════════════
+   0. STATO & PONTE CON APPS SCRIPT
+═══════════════════════════════════════════════════════════════════════ */
+const $ = id => document.getElementById(id);
+let TZ = "Europe/Rome";
+const state = {
+  contacts: [],      // rubrica: {id, name, gmail, alt, group}
+  attendees: [],     // scelti: {contactId|null, which:"gmail"|"alt"|null, email, name, optional}
+  meeting: { zoomLink: "https://univr.zoom.us/my/abarbazeni", zoomPasscode: "", teamsLink: "" },
+  duration: 60,
+  confirmCb: null,
+  editingId: null,
+};
+
+/* ── URL dell'app web Apps Script (Distribuisci → App web → URL che finisce con /exec) ── */
+const API_URL = "https://script.google.com/macros/s/AKfycbz_Ajq1WJUiievknWJn810EgJ6fJaMCMl_pGS5y6_hVVDLVTxQyiftozSDdfoZN3t41Bw/exec";
+const TOKEN_KEY = "uniEventsToken";
+
+const getToken   = () => { try { return localStorage.getItem(TOKEN_KEY) || ""; } catch (e) { return ""; } };
+const setToken   = t  => { try { localStorage.setItem(TOKEN_KEY, t); } catch (e) {} };
+const clearToken = () => { try { localStorage.removeItem(TOKEN_KEY); } catch (e) {} };
+
+/** POST all'Apps Script (text/plain evita il preflight CORS) */
+async function callApi(body) {
+  if (!API_URL || API_URL.indexOf("INCOLLA") === 0) throw new Error("Configura API_URL in university.html");
+  let res;
+  try {
+    res = await fetch(API_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(body) });
+  } catch (e) {
+    throw new Error("Errore di connessione al server");
+  }
+  let data;
+  try { data = await res.json(); } catch (e) { throw new Error("Risposta non valida dal server"); }
+  if (!data.ok) {
+    const err = new Error(data.error || "Errore");
+    err.auth = !!data.auth;
+    throw err;
+  }
+  return data.data;
+}
+
+/** Chiamata autenticata: se il token non vale più, ricompare la schermata di accesso */
+async function run(action, ...args) {
+  try {
+    return await callApi({ action, token: getToken(), args });
+  } catch (e) {
+    if (e.auth) { clearToken(); showLogin(e.message); }
+    throw e;
+  }
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   1. HELPERS
+═══════════════════════════════════════════════════════════════════════ */
+const pad = n => String(n).padStart(2, "0");
+const isoDate = d => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+const dateFromIso = iso => { const [y, m, d] = iso.split("-").map(Number); return new Date(y, m - 1, d); };
+const toMin = hhmm => { if (!hhmm) return NaN; const [h, m] = hhmm.split(":").map(Number); return h * 60 + m; };
+const fromMin = t => { t = Math.max(0, Math.min(t, 23 * 60 + 59)); return `${pad(Math.floor(t / 60))}:${pad(t % 60)}`; };
+const clampCount = n => Math.min(Math.max(parseInt(n, 10) || 0, 2), 52);
+const plural = (n, one, many) => `${n} ${n === 1 ? one : many}`;
+const norm = s => String(s || "").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
+
+function el(tag, cls, text) {
+  const e = document.createElement(tag);
+  if (cls) e.className = cls;
+  if (text !== undefined && text !== null) e.textContent = text;
+  return e;
+}
+
+let toastTimer;
+function toast(msg, kind = "") {
+  const t = $("toast");
+  t.textContent = msg;
+  t.className = `toast show ${kind}`;
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => { t.className = "toast"; }, 3500);
+}
+
+function copyText(text) {
+  const ta = el("textarea");
+  ta.value = text;
+  ta.setAttribute("readonly", "");
+  ta.style.cssText = "position:fixed;top:0;left:0;opacity:0;";
+  document.body.appendChild(ta);
+  ta.select();
+  ta.setSelectionRange(0, text.length);
+  let ok = false;
+  try { ok = document.execCommand("copy"); } catch (e) { ok = false; }
+  ta.remove();
+  if (!ok && navigator.clipboard) navigator.clipboard.writeText(text).catch(() => {});
+}
+
+function copyBtn(label, text) {
+  const b = el("button", "secondary", label);
+  b.type = "button";
+  b.onclick = () => { copyText(text); b.textContent = "Copiato ✓"; setTimeout(() => { b.textContent = label; }, 1000); };
+  return b;
+}
+
+function linkBtn(label, href, small) {
+  const a = el("a", "btn-link" + (small ? " small" : ""), label);
+  a.href = href; a.target = "_blank"; a.rel = "noopener";
+  return a;
+}
+
+function setBusy(btn, busy, label) {
+  if (busy) { btn.dataset.label = btn.textContent; btn.textContent = label; btn.disabled = true; }
+  else { btn.textContent = btn.dataset.label || btn.textContent; btn.disabled = false; }
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   2. TESTI (IT / EN)
+═══════════════════════════════════════════════════════════════════════ */
+const T = {
+  it: {
+    locale: "it-IT",
+    zoomJoin: "Partecipa alla riunione Zoom",
+    teamsJoin: "Partecipa alla riunione Microsoft Teams",
+    zoomId: "ID riunione",
+    zoomPw: "Passcode",
+    meetPending: "link nell'invito",
+    repeat: {
+      weekly:   n => `ogni settimana (${n} incontri)`,
+      biweekly: n => `ogni 2 settimane (${n} incontri)`,
+      monthly:  n => `ogni mese (${n} incontri)`,
+    },
+  },
+  en: {
+    locale: "en-GB",
+    zoomJoin: "Join Zoom meeting",
+    teamsJoin: "Join Microsoft Teams meeting",
+    zoomId: "Meeting ID",
+    zoomPw: "Passcode",
+    meetPending: "link in the invitation",
+    repeat: {
+      weekly:   n => `weekly (${n} sessions)`,
+      biweekly: n => `every 2 weeks (${n} sessions)`,
+      monthly:  n => `monthly (${n} sessions)`,
+    },
+  },
+};
+function langs() { const l = $("lang").value; return l === "both" ? ["it", "en"] : [l]; }
+function tr(key) { return [...new Set(langs().map(l => T[l][key]))].join(" / "); }
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   3. RUBRICA & PARTECIPANTI
+═══════════════════════════════════════════════════════════════════════ */
+const EMAIL_RE = /[A-Z0-9._%+'-]+@[A-Z0-9.-]+\.[A-Z]{2,}/gi;
+const contactById = id => state.contacts.find(c => c.id === id);
+const isSelected = id => state.attendees.some(a => a.contactId === id);
+const preferred = c => (c.gmail ? "gmail" : "alt");
+/** "mario@gmail.com" → "gmail", "mario@studenti.univr.it" → "univr" */
+function mailTag(email) {
+  const parts = (String(email).split("@")[1] || "").toLowerCase().split(".");
+  return parts.length > 1 ? parts[parts.length - 2] : (parts[0] || email);
+}
+
+function addContact(c) {
+  if (isSelected(c.id)) return false;
+  const which = preferred(c);
+  const email = c[which];
+  // se l'indirizzo era già stato aggiunto a mano, lo sostituisce col contatto
+  state.attendees = state.attendees.filter(a => a.email !== c.gmail && a.email !== c.alt);
+  state.attendees.push({ contactId: c.id, which, email, name: c.name, optional: false });
+  return true;
+}
+function removeContact(id) { state.attendees = state.attendees.filter(a => a.contactId !== id); }
+
+function visibleContacts() {
+  const q = norm($("search").value.trim());
+  const g = $("groupFilter").value;
+  return state.contacts.filter(c =>
+    (!g || c.group === g) &&
+    (!q || norm(`${c.name} ${c.gmail} ${c.alt} ${c.group}`).includes(q)));
+}
+
+function renderContacts() {
+  const host = $("contacts");
+  host.innerHTML = "";
+  if (!state.contacts.length) {
+    host.appendChild(el("div", "empty", "La rubrica è vuota: aggiungi i contatti con “✏️ Gestisci rubrica”."));
+    return;
+  }
+  const list = visibleContacts();
+  if (!list.length) { host.appendChild(el("div", "empty", "Nessun contatto trovato.")); return; }
+  list.forEach(c => {
+    const row = el("label", "contact-row");
+    const cb = el("input");
+    cb.type = "checkbox";
+    cb.checked = isSelected(c.id);
+    cb.onchange = () => { if (cb.checked) addContact(c); else removeContact(c.id); renderAttendees(); update(); };
+    const main = el("div", "contact-main");
+    main.append(el("div", "contact-name", c.name), el("div", "contact-mail", [c.gmail, c.alt].filter(Boolean).join(" · ")));
+    row.append(cb, main);
+    if (c.group) row.appendChild(el("span", "group-tag", c.group));
+    host.appendChild(row);
+  });
+}
+
+function renderGroups() {
+  const groups = [...new Set(state.contacts.map(c => c.group).filter(Boolean))].sort((a, b) => a.localeCompare(b, "it"));
+  const sel = $("groupFilter");
+  const cur = sel.value;
+  sel.innerHTML = "";
+  sel.appendChild(Object.assign(el("option", null, "Tutti i gruppi"), { value: "" }));
+  groups.forEach(g => sel.appendChild(Object.assign(el("option", null, g), { value: g })));
+  sel.value = groups.includes(cur) ? cur : "";
+  const dl = $("groupList");
+  dl.innerHTML = "";
+  groups.forEach(g => dl.appendChild(Object.assign(el("option"), { value: g })));
+}
+
+function addManualEmails(text) {
+  const found = (String(text).match(EMAIL_RE) || []).map(e => e.toLowerCase());
+  let added = 0;
+  found.forEach(email => {
+    if (state.attendees.some(a => a.email === email)) return;
+    const c = state.contacts.find(x => x.gmail === email || x.alt === email);
+    if (c && !isSelected(c.id)) {           // è in rubrica → lo aggiunge come contatto con quell'indirizzo
+      state.attendees.push({ contactId: c.id, which: c.gmail === email ? "gmail" : "alt", email, name: c.name, optional: false });
+    } else if (!c) {
+      state.attendees.push({ contactId: null, which: null, email, name: "", optional: false });
+    } else return;
+    added++;
+  });
+  if (found.length) { renderAttendees(); update(); }
+  return { found: found.length, added };
+}
+
+function commitEmailInput() {
+  const inp = $("emailInput");
+  const v = inp.value.trim();
+  if (!v) return;
+  const r = addManualEmails(v);
+  if (r.found) inp.value = "";
+  else toast("Nessun indirizzo email valido trovato", "warn");
+}
+
+function renderAttendees() {
+  const host = $("chips");
+  host.innerHTML = "";
+  state.attendees.forEach((a, i) => {
+    const chip = el("div", "chip" + (a.optional ? " opt" : ""));
+    const c = a.contactId ? contactById(a.contactId) : null;
+
+    if (c) {
+      chip.appendChild(el("span", "chip-name", c.name));
+      if (c.gmail && c.alt) {
+        const sel = el("select", "chip-sel");
+        sel.title = "Indirizzo a cui inviare l'invito";
+        const sameTag = mailTag(c.gmail) === mailTag(c.alt);   // es. due gmail: serve l'indirizzo intero
+        [["gmail", c.gmail], ["alt", c.alt]].forEach(([k, v]) => {
+          const o = el("option", null, sameTag ? v : mailTag(v));
+          o.value = k;
+          o.title = v;
+          sel.appendChild(o);
+        });
+        sel.value = a.which;
+        sel.onchange = () => { a.which = sel.value; a.email = c[a.which]; sel.title = a.email; update(); };
+        sel.title = a.email;
+        chip.appendChild(sel);
+      } else {
+        const m = el("span", "chip-mail", mailTag(a.email));
+        m.title = a.email;
+        chip.appendChild(m);
+      }
+    } else {
+      const m = el("span", "chip-mail", a.email);
+      m.style.color = "#111";
+      chip.appendChild(m);
+    }
+
+    const opt = el("button", "chip-opt", a.optional ? "facoltativo" : "obbligatorio");
+    opt.type = "button";
+    opt.title = "Cambia obbligatorio / facoltativo";
+    opt.onclick = () => { a.optional = !a.optional; renderAttendees(); update(); };
+
+    const x = el("button", "chip-x", "×");
+    x.type = "button";
+    x.title = "Rimuovi";
+    x.setAttribute("aria-label", "Rimuovi " + (a.name || a.email));
+    x.onclick = () => { state.attendees.splice(i, 1); renderAttendees(); renderContacts(); update(); };
+
+    chip.append(opt, x);
+    host.appendChild(chip);
+  });
+
+  const n = state.attendees.length;
+  const nOpt = state.attendees.filter(a => a.optional).length;
+  $("attCount").textContent = n
+    ? plural(n, "selezionato", "selezionati") + (nOpt ? ` · ${nOpt} facoltativ${nOpt === 1 ? "o" : "i"}` : "")
+    : "Nessun partecipante selezionato";
+  $("clearAtt").hidden = n === 0;
+  renderContacts();
+}
+
+/** Dopo una modifica alla rubrica: aggiorna nomi/indirizzi dei partecipanti già scelti */
+function syncAttendeesWithContacts() {
+  state.attendees.forEach(a => {
+    if (!a.contactId) return;
+    const c = contactById(a.contactId);
+    if (!c) { a.contactId = null; a.which = null; a.name = ""; return; }   // contatto eliminato → resta come email libera
+    if (!c[a.which]) a.which = preferred(c);
+    a.email = c[a.which];
+    a.name = c.name;
+  });
+}
+
+function setContacts(list) {
+  state.contacts = list || [];
+  syncAttendeesWithContacts();
+  renderGroups();
+  renderAttendees();
+  renderBookList();
+  update();
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   4. EDITOR RUBRICA
+═══════════════════════════════════════════════════════════════════════ */
+function renderBookList() {
+  const host = $("bookList");
+  host.innerHTML = "";
+  if (!state.contacts.length) { host.appendChild(el("div", "muted", "Nessun contatto.")); return; }
+  state.contacts.forEach(c => {
+    const row = el("div", "bk");
+    const info = el("div", "bk-info");
+    info.appendChild(el("div", "contact-name", c.name + (c.group ? `  ·  ${c.group}` : "")));
+    info.appendChild(el("div", "contact-mail", [c.gmail && `Gmail: ${c.gmail}`, c.alt && `Alt: ${c.alt}`].filter(Boolean).join(" · ")));
+    const act = el("div", "bk-actions");
+    const edit = el("button", "secondary small", "Modifica");
+    edit.type = "button";
+    edit.onclick = () => startEdit(c);
+    const del = el("button", "secondary small danger", "Elimina");
+    del.type = "button";
+    del.onclick = async () => {
+      if (del.dataset.armed !== "1") { del.dataset.armed = "1"; del.textContent = "Conferma?"; setTimeout(() => { del.dataset.armed = ""; del.textContent = "Elimina"; }, 3000); return; }
+      setBusy(del, true, "⏳");
+      try { setContacts(await run("deleteContact", c.id)); toast("Contatto eliminato", "ok"); }
+      catch (e) { toast("Errore: " + e.message, "err"); setBusy(del, false); }
+    };
+    act.append(edit, del);
+    row.append(info, act);
+    host.appendChild(row);
+  });
+}
+
+function startEdit(c) {
+  state.editingId = c ? c.id : null;
+  $("bkName").value = c ? c.name : "";
+  $("bkGmail").value = c ? c.gmail : "";
+  $("bkAlt").value = c ? c.alt : "";
+  $("bkGroup").value = c ? c.group : "";
+  $("bkFormTitle").textContent = c ? `Modifica: ${c.name}` : "Nuovo contatto";
+  $("bkSave").textContent = c ? "Salva modifiche" : "Salva contatto";
+  $("bkCancel").hidden = !c;
+  if (c) $("bkName").focus();
+}
+
+async function saveContactForm() {
+  const c = {
+    id: state.editingId || undefined,
+    name: $("bkName").value.trim(),
+    gmail: $("bkGmail").value.trim(),
+    alt: $("bkAlt").value.trim(),
+    group: $("bkGroup").value.trim(),
+  };
+  if (!c.gmail && !c.alt) { toast("Inserisci almeno un indirizzo email", "warn"); return; }
+  const btn = $("bkSave");
+  setBusy(btn, true, "⏳ Salvo…");
+  try {
+    setContacts(await run("saveContact", c));
+    toast(state.editingId ? "Contatto aggiornato" : "Contatto aggiunto", "ok");
+    setBusy(btn, false);
+    startEdit(null);
+  } catch (e) {
+    toast("Errore: " + e.message, "err");
+    setBusy(btn, false);
+  }
+}
+
+function parseImport(text) {
+  return text.split(/\r?\n/).map(l => l.trim()).filter(Boolean).map(line => {
+    const parts = line.split(/[;\t]/.test(line) ? /[;\t]/ : /,/).map(s => s.trim().replace(/^<|>$/g, ""));
+    const emails = parts.filter(p => /@/.test(p));
+    const others = parts.filter(p => p && !/@/.test(p));
+    return { name: others[0] || "", gmail: emails[0] || "", alt: emails[1] || "", group: others[1] || "" };
+  }).filter(r => r.gmail || r.alt);
+}
+
+async function importContactsFromText() {
+  const rows = parseImport($("bkImport").value);
+  if (!rows.length) { toast("Nessuna riga con email da importare", "warn"); return; }
+  const btn = $("bkImportBtn");
+  setBusy(btn, true, "⏳ Importo…");
+  try {
+    setContacts(await run("importContacts", rows));
+    $("bkImport").value = "";
+    toast(`Importati ${plural(rows.length, "contatto", "contatti")}`, "ok");
+  } catch (e) {
+    toast("Errore: " + e.message, "err");
+  } finally {
+    setBusy(btn, false);
+  }
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   5. RACCOLTA DATI & COMPOSIZIONE TESTI
+═══════════════════════════════════════════════════════════════════════ */
+function collect() {
+  return {
+    title:  $("title").value.trim(),
+    date:   $("date").value,
+    start:  $("start").value,
+    end:    $("end").value,
+    calendarId: $("calendar").value || "primary",
+    repeat: $("repeat").value,
+    count:  clampCount($("count").value),
+    attendees: state.attendees.map(a => ({ email: a.email, name: a.name, optional: a.optional })),
+    guestsCanSeeOthers: $("canSee").checked,
+    guestsCanInvite:    $("canInvite").checked,
+    guestsCanModify:    $("canModify").checked,
+    place:  $("place").value.trim(),
+    online: document.querySelector('input[name="online"]:checked').value,
+    zoomLink:  $("zoomLink").value.trim(),
+    zoomId:    $("zoomId").value.trim(),
+    zoomPw:    $("zoomPw").value.trim(),
+    teamsLink: $("teamsLink").value.trim(),
+    notes:     $("description").value.trim(),
+    reminderMin: $("reminder").value,
+    colorId:   $("color").value,
+    sendInvites: $("sendInvites").checked,
+  };
+}
+
+/** Link della riunione online scelta (Zoom/Teams); Meet lo crea Google */
+function onlineLink(f) {
+  if (f.online === "zoom") return f.zoomLink;
+  if (f.online === "teams") return f.teamsLink;
+  return "";
+}
+
+function onlineBlock(f) {
+  if (f.online === "zoom" && f.zoomLink) {
+    const out = [tr("zoomJoin"), f.zoomLink];
+    if (f.zoomId) out.push(`${tr("zoomId")}: ${f.zoomId}`);
+    if (f.zoomPw) out.push(`${tr("zoomPw")}: ${f.zoomPw}`);
+    return out.join("\n");
+  }
+  if (f.online === "teams" && f.teamsLink) return [tr("teamsJoin"), f.teamsLink].join("\n");
+  return "";
+}
+
+function buildDescription(f) {
+  const parts = [];
+  if (f.notes) parts.push(f.notes);
+  const b = onlineBlock(f);
+  if (b) parts.push((f.notes ? "──────────\n" : "") + b);
+  return parts.join("\n\n");
+}
+
+function buildLocation(f) { return f.place || onlineLink(f) || ""; }
+
+function buildRRule(f) {
+  const n = clampCount(f.count);
+  switch (f.repeat) {
+    case "weekly":   return `RRULE:FREQ=WEEKLY;COUNT=${n}`;
+    case "biweekly": return `RRULE:FREQ=WEEKLY;INTERVAL=2;COUNT=${n}`;
+    case "monthly":  return `RRULE:FREQ=MONTHLY;COUNT=${n}`;
+    default:         return "";
+  }
+}
+
+function whenText(f) {
+  if (!f.date || !f.start || !f.end) return "";
+  const d = dateFromIso(f.date);
+  const opts = { weekday: "long", day: "numeric", month: "long", year: "numeric" };
+  let s = `${langs().map(l => d.toLocaleDateString(T[l].locale, opts)).join(" / ")}, ${f.start}–${f.end}`;
+  if (f.repeat !== "none") s += " · " + langs().map(l => T[l].repeat[f.repeat](f.count)).join(" / ");
+  return s;
+}
+
+function shareText(f, meetLink) {
+  const out = [`📅 ${f.title || "(senza titolo)"}`];
+  const w = whenText(f);
+  if (w) out.push(`🗓 ${w}`);
+  if (f.place) out.push(`📍 ${f.place}`);
+  if (f.online === "zoom" && f.zoomLink) {
+    out.push(`💻 Zoom: ${f.zoomLink}`);
+    const extra = [f.zoomId && `${tr("zoomId")}: ${f.zoomId}`, f.zoomPw && `${tr("zoomPw")}: ${f.zoomPw}`].filter(Boolean).join(" · ");
+    if (extra) out.push(`    ${extra}`);
+  }
+  if (f.online === "teams" && f.teamsLink) out.push(`💻 Teams: ${f.teamsLink}`);
+  if (f.online === "meet") out.push(`🎥 Google Meet: ${meetLink || tr("meetPending")}`);
+  if (f.notes) out.push("", f.notes);
+  return out.join("\n");
+}
+
+function templateLink(f, meetLink) {
+  const d = f.date.replace(/-/g, "");
+  const s = f.start.replace(":", "") + "00";
+  const e = f.end.replace(":", "") + "00";
+  let details = buildDescription(f);
+  if (meetLink) details = (details ? details + "\n\n" : "") + "Google Meet: " + meetLink;
+  const params = new URLSearchParams({ action: "TEMPLATE", text: f.title, dates: `${d}T${s}/${d}T${e}`, ctz: TZ });
+  if (details) params.set("details", details);
+  const loc = buildLocation(f) || meetLink || "";
+  if (loc) params.set("location", loc);
+  const rr = buildRRule(f);
+  if (rr) params.set("recur", rr);
+  return "https://calendar.google.com/calendar/render?" + params.toString().replace(/\+/g, "%20");
+}
+
+function validate(f) {
+  if (!f.title) return "Inserisci un titolo.";
+  if (!f.date || !f.start || !f.end) return "Inserisci data e orari.";
+  if (toMin(f.end) <= toMin(f.start)) return "L'ora di fine deve essere dopo l'inizio.";
+  if (f.online === "zoom" && !/^https?:\/\/\S+$/i.test(f.zoomLink)) return "Inserisci il link Zoom.";
+  if (f.online === "teams" && !/^https?:\/\/\S+$/i.test(f.teamsLink)) return "Incolla il link della riunione Teams.";
+  return "";
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   6. ANTEPRIMA & STATO
+═══════════════════════════════════════════════════════════════════════ */
+function pvRow(host, icon, text) {
+  const r = el("div", "pv-row");
+  r.append(el("span", null, icon), el("span", null, text));
+  host.appendChild(r);
+}
+
+function renderPreview(f) {
+  const host = $("preview");
+  host.innerHTML = "";
+  host.appendChild(el("div", "pv-title", f.title || "(titolo)"));
+  pvRow(host, "🗓", whenText(f) || "—");
+  const loc = buildLocation(f);
+  if (loc) pvRow(host, "📍", loc);
+  if (f.online === "meet") pvRow(host, "🎥", "Google Meet – link creato automaticamente");
+
+  const label = a => a.name ? `${a.name} <${a.email}>` : a.email;
+  const req = f.attendees.filter(a => !a.optional).map(label);
+  const opt = f.attendees.filter(a => a.optional).map(label);
+  pvRow(host, "👥", f.attendees.length
+    ? req.join(", ") + (opt.length ? `${req.length ? " · " : ""}facoltativi: ${opt.join(", ")}` : "")
+    : "Nessun partecipante");
+  pvRow(host, "✉️", !f.sendInvites
+    ? "Nessuna email: l'evento viene creato solo nel tuo calendario"
+    : f.attendees.length ? `Riceveranno l'invito via email (${f.attendees.length})` : "Nessun invito da inviare");
+
+  const desc = buildDescription(f);
+  if (desc) host.appendChild(el("div", "out", desc));
+}
+
+function syncUI() {
+  const online = document.querySelector('input[name="online"]:checked').value;
+  $("meetBox").hidden = online !== "meet";
+  $("zoomBox").hidden = online !== "zoom";
+  $("teamsBox").hidden = online !== "teams";
+  $("count").disabled = $("repeat").value === "none";
+  const dur = toMin($("end").value) - toMin($("start").value);
+  document.querySelectorAll("#durations [data-dur]").forEach(b => b.classList.toggle("active", Number(b.dataset.dur) === dur));
+}
+
+function update() {
+  syncUI();
+  const f = collect();
+  renderPreview(f);
+  const s = $("summary");
+  s.innerHTML = "";
+  const err = validate(f);
+  if (err) { s.appendChild(el("span", "warn", err)); return; }
+  const d = dateFromIso(f.date);
+  const parts = [el("span", "ok", "OK"), document.createTextNode(
+    ` · ${d.toLocaleDateString("it-IT", { day: "2-digit", month: "2-digit" })} ${f.start}–${f.end} · ${plural(f.attendees.length, "partecipante", "partecipanti")}`)];
+  const today = new Date(); today.setHours(0, 0, 0, 0);
+  if (d < today) parts.push(el("span", "warn", " · data nel passato"));
+  s.append(...parts);
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   7. CREAZIONE EVENTO
+═══════════════════════════════════════════════════════════════════════ */
+function askConfirm(text, onYes) { $("confirmText").textContent = text; $("confirmBox").hidden = false; state.confirmCb = onYes; }
+function closeConfirm() { $("confirmBox").hidden = true; state.confirmCb = null; }
+
+function onCreateClick() {
+  const f = collect();
+  const err = validate(f);
+  if (err) { toast(err, "warn"); return; }
+  const n = f.attendees.length;
+  if (f.sendInvites && n) askConfirm(`Creo l'evento e invio l'invito a ${plural(n, "persona", "persone")}. Confermi?`, () => doCreate(f));
+  else doCreate(f);
+}
+
+async function doCreate(f) {
+  closeConfirm();
+  const btn = $("create");
+  setBusy(btn, true, "⏳ Creo l'evento…");
+  const payload = {
+    title: f.title, date: f.date, start: f.start, end: f.end,
+    calendarId: f.calendarId, repeat: f.repeat, count: f.count,
+    attendees: f.attendees,
+    guestsCanSeeOthers: f.guestsCanSeeOthers, guestsCanInvite: f.guestsCanInvite, guestsCanModify: f.guestsCanModify,
+    description: buildDescription(f),
+    location: buildLocation(f),
+    meet: f.online === "meet",
+    reminderMin: f.reminderMin, colorId: f.colorId, sendInvites: f.sendInvites,
+  };
+  try {
+    const res = await run("createEvent", payload);
+    renderResult(f, res);
+    toast("Evento creato ✓", "ok");
+    loadUpcoming();
+  } catch (e) {
+    toast("Errore: " + e.message, "err");
+    console.error(e);
+  } finally {
+    setBusy(btn, false);
+  }
+}
+
+function renderResult(f, res) {
+  $("resultTitle").textContent = res.invited
+    ? `✅ Evento creato · invito inviato a ${plural(res.invited, "persona", "persone")}`
+    : "✅ Evento creato (nessuna email inviata)";
+  const links = $("resultLinks");
+  links.innerHTML = "";
+  if (res.htmlLink) links.appendChild(linkBtn("Apri in Google Calendar", res.htmlLink));
+  if (res.meetLink) links.appendChild(copyBtn("Copia link Meet", res.meetLink));
+  links.appendChild(copyBtn("Copia link “Aggiungi al calendario”", templateLink(f, res.meetLink)));
+  links.appendChild(copyBtn("Copia testo", shareText(f, res.meetLink)));
+  $("resultText").textContent = shareText(f, res.meetLink);
+  $("resultCard").hidden = false;
+  $("resultCard").scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   8. PROSSIMI EVENTI
+═══════════════════════════════════════════════════════════════════════ */
+function fmtWhen(s, e) {
+  if (s.length === 10) return dateFromIso(s).toLocaleDateString("it-IT", { weekday: "short", day: "numeric", month: "short" });
+  const ds = new Date(s), de = new Date(e);
+  const day = ds.toLocaleDateString("it-IT", { weekday: "short", day: "numeric", month: "short", timeZone: TZ });
+  const t = d => d.toLocaleTimeString("it-IT", { hour: "2-digit", minute: "2-digit", timeZone: TZ });
+  return `${day} · ${t(ds)}–${t(de)}`;
+}
+
+function upcomingItem(ev) {
+  const row = el("div", "ev");
+  const info = el("div");
+  info.appendChild(el("div", "ev-title", (ev.recurring ? "🔁 " : "") + ev.title));
+  let meta = fmtWhen(ev.start, ev.end);
+  if (ev.guests) { meta += ` · 👥 ${ev.accepted}/${ev.guests} sì`; if (ev.declined) meta += ` · ${ev.declined} no`; }
+  info.appendChild(el("div", "muted", meta));
+
+  const actions = el("div", "ev-actions");
+  const showButtons = () => {
+    actions.innerHTML = "";
+    if (ev.htmlLink) actions.appendChild(linkBtn("Apri", ev.htmlLink, true));
+    const cancel = el("button", "secondary small danger", "Annulla evento");
+    cancel.type = "button";
+    cancel.onclick = showConfirm;
+    actions.appendChild(cancel);
+  };
+  const showConfirm = () => {
+    actions.innerHTML = "";
+    actions.appendChild(el("span", "muted", ev.recurring ? "Annullare tutta la serie e avvisare gli invitati?" : "Annullare e avvisare gli invitati?"));
+    const yes = el("button", "small", "Sì, annulla");
+    yes.type = "button";
+    yes.onclick = async () => {
+      setBusy(yes, true, "⏳");
+      try { await run("cancelEvent", $("calendar").value || "primary", ev.id); toast("Evento annullato", "ok"); loadUpcoming(); }
+      catch (e) { toast("Errore: " + e.message, "err"); showButtons(); }
+    };
+    const no = el("button", "secondary small", "No");
+    no.type = "button";
+    no.onclick = showButtons;
+    actions.append(yes, no);
+  };
+  showButtons();
+  row.append(info, actions);
+  return row;
+}
+
+async function loadUpcoming() {
+  const host = $("upcoming");
+  host.innerHTML = "";
+  host.appendChild(el("div", "muted", "Caricamento…"));
+  try {
+    const items = await run("listUpcoming", $("calendar").value || "primary");
+    host.innerHTML = "";
+    if (!items.length) { host.appendChild(el("div", "muted", "Nessun evento nei prossimi 60 giorni.")); return; }
+    items.forEach(ev => host.appendChild(upcomingItem(ev)));
+  } catch (e) {
+    host.innerHTML = "";
+    host.appendChild(el("div", "warn", "Impossibile caricare gli eventi: " + e.message));
+  }
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   9. EVENTI UI
+═══════════════════════════════════════════════════════════════════════ */
+// Orari
+$("start").addEventListener("change", () => { if ($("start").value) $("end").value = fromMin(toMin($("start").value) + state.duration); update(); });
+$("end").addEventListener("change", () => { const d = toMin($("end").value) - toMin($("start").value); if (d > 0) state.duration = d; update(); });
+document.querySelectorAll("#durations [data-dur]").forEach(b => b.addEventListener("click", () => {
+  state.duration = Number(b.dataset.dur);
+  if ($("start").value) $("end").value = fromMin(toMin($("start").value) + state.duration);
+  update();
+}));
+
+// Rubrica: menu a tendina
+function setPicker(open) {
+  $("pickerPanel").hidden = !open;
+  $("pickerBtn").setAttribute("aria-expanded", String(open));
+  if (open) $("search").focus();
+}
+$("pickerBtn").addEventListener("click", () => setPicker($("pickerPanel").hidden));
+$("pickerDone").addEventListener("click", () => setPicker(false));
+// pointerdown: scatta prima che la lista venga ridisegnata
+document.addEventListener("pointerdown", e => { if (!$("picker").contains(e.target)) setPicker(false); });
+$("picker").addEventListener("keydown", e => { if (e.key === "Escape") { setPicker(false); $("pickerBtn").focus(); } });
+
+$("search").addEventListener("input", renderContacts);
+$("groupFilter").addEventListener("change", renderContacts);
+$("selectVisible").addEventListener("click", () => {
+  let n = 0;
+  visibleContacts().forEach(c => { if (addContact(c)) n++; });
+  renderAttendees(); update();
+  toast(n ? `Aggiunti ${plural(n, "contatto", "contatti")}` : "Già tutti selezionati", "ok");
+});
+$("clearAtt").addEventListener("click", () => { state.attendees = []; renderAttendees(); update(); });
+$("toggleBook").addEventListener("click", () => {
+  const ed = $("bookEditor");
+  ed.hidden = !ed.hidden;
+  $("toggleBook").textContent = ed.hidden ? "✏️ Gestisci rubrica" : "Chiudi rubrica";
+  if (!ed.hidden) { startEdit(null); ed.scrollIntoView({ behavior: "smooth", block: "nearest" }); }
+});
+$("bkSave").addEventListener("click", saveContactForm);
+$("bkCancel").addEventListener("click", () => startEdit(null));
+$("bkImportBtn").addEventListener("click", importContactsFromText);
+
+// Email libere
+$("addEmail").addEventListener("click", commitEmailInput);
+$("emailInput").addEventListener("keydown", e => {
+  if (e.key === "Enter" || e.key === "," || e.key === ";") { e.preventDefault(); commitEmailInput(); }
+});
+$("emailInput").addEventListener("paste", e => {
+  const t = (e.clipboardData || window.clipboardData).getData("text");
+  if ((t.match(EMAIL_RE) || []).length) {
+    e.preventDefault();
+    const r = addManualEmails(t);
+    toast(r.added ? `Aggiunti ${plural(r.added, "indirizzo", "indirizzi")}` : "Indirizzi già presenti", "ok");
+  }
+});
+
+// Zoom: incollando un invito completo si compilano link, ID e passcode
+function formatZoomId(id) {
+  if (id.length === 11) return id.replace(/(\d{3})(\d{4})(\d{4})/, "$1 $2 $3");
+  if (id.length === 10) return id.replace(/(\d{3})(\d{3})(\d{4})/, "$1 $2 $3");
+  return id.replace(/(\d{3})(\d{3})(\d{3})/, "$1 $2 $3");
+}
+function fillZoomFromText(text) {
+  const url = text.match(/https?:\/\/[\w.-]*zoom\.us\/[^\s<>"]+/i);
+  if (!url) return false;
+  $("zoomLink").value = url[0];
+  const id = text.match(/(?:ID\s+(?:della\s+)?riunione|Meeting\s+ID)\s*:?\s*([\d ]{9,14})/i);
+  const pw = text.match(/(?:Passcode|Password)\s*:?\s*(\S+)/i);
+  const fromUrl = url[0].match(/\/j\/(\d{9,11})/);
+  $("zoomId").value = id ? id[1].trim() : (fromUrl ? formatZoomId(fromUrl[1]) : "");
+  $("zoomPw").value = pw ? pw[1] : (/\/my\//.test(url[0]) ? state.meeting.zoomPasscode : "");
+  return true;
+}
+$("zoomLink").addEventListener("paste", e => {
+  const t = (e.clipboardData || window.clipboardData).getData("text");
+  if (t && /\n|ID|Passcode|Password/i.test(t) && fillZoomFromText(t)) { e.preventDefault(); update(); }
+});
+$("zoomRestore").addEventListener("click", () => { setMeetingDefaults(); update(); });
+
+// Teams: se si incolla un invito completo, tiene solo il link
+$("teamsLink").addEventListener("paste", e => {
+  const t = (e.clipboardData || window.clipboardData).getData("text");
+  const m = t && t.match(/https?:\/\/teams\.(?:microsoft|live)\.com\/[^\s<>"]+/i);
+  if (m && m[0] !== t.trim()) { e.preventDefault(); $("teamsLink").value = m[0]; update(); }
+});
+
+// Aggiornamento anteprima
+["title", "date", "place", "zoomLink", "zoomId", "zoomPw", "teamsLink", "description", "count"]
+  .forEach(id => $(id).addEventListener("input", update));
+["repeat", "lang", "reminder", "color", "sendInvites", "canSee", "canInvite", "canModify"]
+  .forEach(id => $(id).addEventListener("change", update));
+document.querySelectorAll('input[name="online"]').forEach(r => r.addEventListener("change", update));
+$("calendar").addEventListener("change", () => { update(); loadUpcoming(); });
+
+// Azioni
+$("create").addEventListener("click", onCreateClick);
+$("confirmYes").addEventListener("click", () => { if (state.confirmCb) state.confirmCb(); });
+$("confirmNo").addEventListener("click", closeConfirm);
+$("copyPreview").addEventListener("click", () => {
+  copyText(shareText(collect()));
+  const b = $("copyPreview");
+  b.textContent = "Copiato ✓";
+  setTimeout(() => { b.textContent = "Copia testo"; }, 1000);
+});
+$("refresh").addEventListener("click", loadUpcoming);
+$("resultClose").addEventListener("click", () => { $("resultCard").hidden = true; });
+$("resetTop").addEventListener("click", resetAll);
+$("resetBottom").addEventListener("click", resetAll);
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   10. RESET & INIT
+═══════════════════════════════════════════════════════════════════════ */
+function setDefaults() {
+  const t = new Date();
+  t.setDate(t.getDate() + 1);
+  $("date").value = isoDate(t);
+  $("start").value = "10:00";
+  $("end").value = "11:00";
+  state.duration = 60;
+}
+
+function setMeetingDefaults() {
+  $("zoomLink").value = state.meeting.zoomLink || "";
+  $("zoomId").value = "";
+  $("zoomPw").value = state.meeting.zoomPasscode || "";
+  $("teamsLink").value = state.meeting.teamsLink || "";
+}
+
+function resetAll() {
+  ["title", "place", "description", "emailInput", "search"].forEach(id => { $(id).value = ""; });
+  setDefaults();
+  setMeetingDefaults();
+  $("groupFilter").value = "";
+  $("repeat").value = "none";
+  $("count").value = "8";
+  $("canSee").checked = true;
+  $("canInvite").checked = false;
+  $("canModify").checked = false;
+  document.querySelector('input[name="online"][value="none"]').checked = true;
+  $("lang").value = "it";
+  $("reminder").value = "default";
+  $("color").value = "";
+  $("sendInvites").checked = true;
+  state.attendees = [];
+  closeConfirm();
+  $("resultCard").hidden = true;
+  renderAttendees();
+  update();
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+function applyConfig(cfg) {
+  TZ = cfg.timezone || TZ;
+  $("userTag").textContent = cfg.userEmail || "";
+  state.meeting = Object.assign(state.meeting, cfg.meeting || {});
+  setMeetingDefaults();
+
+  const sel = $("calendar");
+  sel.innerHTML = "";
+  (cfg.calendars || []).forEach(c => sel.appendChild(Object.assign(el("option", null, c.name), { value: c.id })));
+
+  setContacts(cfg.contacts || []);
+}
+
+/* ── Accesso ────────────────────────────────────────────────────── */
+function showLogin(msg) {
+  $("login").hidden = false;
+  $("loginErr").textContent = msg || "";
+  setTimeout(() => $("loginPw").focus(), 50);
+}
+
+$("loginForm").addEventListener("submit", async e => {
+  e.preventDefault();
+  const pw = $("loginPw").value;
+  if (!pw) return;
+  const btn = $("loginBtn");
+  setBusy(btn, true, "Verifico…");
+  $("loginErr").textContent = "";
+  try {
+    const r = await callApi({ action: "login", password: pw });
+    setToken(r.token);
+    $("loginPw").value = "";
+    $("login").hidden = true;
+    start();
+  } catch (err) {
+    $("loginErr").textContent = err.message;
+  } finally {
+    setBusy(btn, false);
+  }
+});
+
+$("logout").addEventListener("click", () => { clearToken(); showLogin(); });
+
+let configLoaded = false;
+async function start() {
+  if (configLoaded) { loadUpcoming(); return; }   // riaccesso a metà lavoro: non tocca il modulo
+  try {
+    const cfg = await run("getConfig");
+    applyConfig(cfg);
+    configLoaded = true;
+    loadUpcoming();
+  } catch (e) {
+    if (!e.auth) {
+      $("userTag").textContent = "non collegato";
+      toast(e.message, "err");
+    }
+  }
+}
+
+setDefaults();
+setMeetingDefaults();
+renderAttendees();
+update();
+
+if (getToken()) { $("login").hidden = true; start(); }
+else showLogin();
+</script>
+</body>
+</html>
