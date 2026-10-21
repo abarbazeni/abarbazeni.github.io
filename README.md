@@ -28,8 +28,8 @@ assets/
 4. Dopo uno o due minuti il sito è online.
 
 Se usi un repository con un altro nome (es. `website`), il sito sarà su
-`https://<tuo-username>.github.io/website/`: tutto funziona, solo il link "home"
-della pagina 404 punterà alla radice del tuo dominio GitHub.
+`https://<tuo-username>.github.io/website/`: tutto funziona, il link "home" (e la favicon)
+della pagina 404 vanno aggiornati con il nome del repo (qui: `/abarbazeni/`).
 
 ## Personalizzazione
 
