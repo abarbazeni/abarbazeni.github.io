@@ -14,6 +14,8 @@ assets/
   css/style.css     Unico foglio di stile (tema chiaro/scuro automatico, stampa)
   favicon.svg       Icona con le iniziali
   img/              Qui va la foto profilo
+sitemap.xml         Elenco pagine per i motori di ricerca
+robots.txt          Indica ai motori dove trovare la sitemap
 .nojekyll           Dice a GitHub Pages di servire i file così come sono
 ```
 
@@ -29,7 +31,7 @@ assets/
 
 Se usi un repository con un altro nome (es. `website`), il sito sarà su
 `https://<tuo-username>.github.io/website/`: tutto funziona, il link "home" (e la favicon)
-della pagina 404 vanno aggiornati con il nome del repo (qui: `/abarbazeni/`).
+della pagina 404 vanno aggiornati con il nome del repo (oltre a `sitemap.xml`, `robots.txt` e i tag `canonical`).
 
 ## Personalizzazione
 
